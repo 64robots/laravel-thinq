@@ -12,10 +12,84 @@ This is where your description should go. Take a look at [contributing.md](contr
 Via Composer
 
 ``` bash
-$ composer require r64/laravelthinq
+$ composer require 64robots/laravelthinq
 ```
 
 ## Usage
+
+```
+php artisan vendor:publish --provider="R64\LaravelThinq\LaravelThinqServiceProvider"
+
+```
+
+Add this to `.env`
+
+```
+THINQ_ACCOUNT_ID=Your thinq account id
+THINQ_API_KEY=Your thinq api key
+
+```
+
+Use as notification
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use R64\LaravelThinq\ThinqChannel;
+use R64\LaravelThinq\ThinqMessage;
+
+class TestThinq extends Notification
+{
+    use Queueable;
+
+    public $silent = true; //if silent true, the service does not throw error
+
+    /**
+     * Create a new notification instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function via($notifiable)
+    {
+        return [ThinqChannel::class];
+    }
+
+    public function toThinq($notifiable)
+    {
+        return new ThinqMessage('Send test sms', '122233333', '133333333');
+    }
+
+}
+
+```
+
+Use standalone 
+
+```php
+$message = new ThinqMessage('Send test sms', '122233333', '133333333');
+
+new Thinq()
+    ->setMessage($message)
+    ->sendSms() //throws error
+    ->sendSilentSms() //does not throw error
+```
 
 ## Change log
 
