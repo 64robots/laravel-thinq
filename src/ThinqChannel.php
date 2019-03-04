@@ -19,6 +19,10 @@ class ThinqChannel
 
     public function send($notifiable, Notification $notification)
     {
+        // Since thinq is restricted to IP, disable or enable api call when testing
+        if (config('thinq.disable_api_calls')) {
+            return;
+        }
 
         $message = $notification->toThinq($notifiable);
 
