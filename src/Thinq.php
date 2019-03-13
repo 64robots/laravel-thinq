@@ -3,17 +3,16 @@
 namespace R64\LaravelThinq;
 
 use Exception;
+use Illuminate\Support\Facades\App;
 
 class Thinq
 {
-    protected $thinqMessage;
-    protected $account_id;
-    protected $api_key;
+    public $config;
+    public $thinqMessage;
 
-    public function __construct()
+    public function __construct(ThinqConfig $config)
     {
-        $this->account_id = config('thinq.account_id');
-        $this->api_key = config('thinq.api_key');
+        $this->config = $config;
     }
 
     public function withMessage(ThinqMessage $message)
@@ -26,9 +25,18 @@ class Thinq
 
     public function sentSms()
     {
+        // Since thinq is restricted to IP, disable or enable api call when testing
+        if ($this->shouldDisableApiCall()) {
+            return;
+        }
+
+        $apiKey = $this->config->getApiKey();
+        $accountId = $this->config->getAccountId();
+
         $data = $this->thinqMessage->getMessage();
-        $authorization = base64_encode($this->api_key);
-        $url = "https://api.thinq.com/account/{$this->account_id}/product/origination/sms/send";
+        
+        $authorization = base64_encode($apiKey);
+        $url = "https://api.thinq.com/account/{$accountId}/product/origination/sms/send";
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -57,5 +65,10 @@ class Thinq
         } catch(Exception $exception) {
 
         }
+    }
+
+    private function shouldDisableApiCall()
+    {
+        return App::environment() === 'local' && $this->config->shouldDisableApiCalls();
     }
 }

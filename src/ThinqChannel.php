@@ -4,7 +4,6 @@ namespace R64\LaravelThinq;
 
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Facades\Log;
 
 class ThinqChannel
 {
@@ -19,11 +18,6 @@ class ThinqChannel
 
     public function send($notifiable, Notification $notification)
     {
-        // Since thinq is restricted to IP, disable or enable api call when testing
-        if ($this->shouldDisableApiCall()) {
-            return;
-        }
-
         $message = $notification->toThinq($notifiable);
 
         if(property_exists($notification, 'silent') && $notification->silent) {
@@ -31,10 +25,5 @@ class ThinqChannel
         } else {
             $this->thinq->withMessage($message)->sentSms();
         }
-    }
-
-    private function shoudDisableApiCall()
-    {
-        return app()->environment('local') && config('thinq.disable_api_calls');
     }
 }
