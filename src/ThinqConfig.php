@@ -4,18 +4,25 @@ namespace R64\LaravelThinq;
 
 class ThinqConfig
 {
+    public $config;
+
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+
     public function getApiKey()
     {
-        return config('thinq.api_key');
+        return $this->config['api_key'];
     }
 
     public function getAccountId()
     {
-        return config('thinq.account_id');
+        return $this->config['account_id'];
     }
 
     public function shouldDisableApiCalls()
     {
-        return config('thinq.disable_api_calls');
+        return $this->config['disable_api_calls'];
     }
 }
