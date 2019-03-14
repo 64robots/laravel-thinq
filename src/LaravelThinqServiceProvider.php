@@ -16,9 +16,7 @@ class LaravelThinqServiceProvider extends ServiceProvider
         $this->app->when(ThinqChannel::class)
             ->needs(Thinq::class)
             ->give(function () {
-                return new Thinq(
-
-                );
+                return new Thinq($this->app->make(ThinqConfig::class));
             });
 
         // Publishing is only necessary when using the CLI.
@@ -36,9 +34,13 @@ class LaravelThinqServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/laravelthinq.php', 'thinq');
 
+        $this->app->bind(ThinqConfig::class, function ($app) {
+            return new ThinqConfig(config('thinq'));
+        });
+
         // Register the service the package provides.
         $this->app->singleton('laravelthinq', function ($app) {
-            return new Thinq;
+            return new Thinq($this->app->make(ThinqConfig::class));
         });
     }
 
