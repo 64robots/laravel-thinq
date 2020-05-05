@@ -34,7 +34,7 @@ class Thinq
         $accountId = $this->config->getAccountId();
 
         $data = $this->thinqMessage->getMessage();
-        
+
         $authorization = base64_encode($apiKey);
         $url = "https://api.thinq.com/account/{$accountId}/product/origination/sms/send";
 
@@ -69,6 +69,6 @@ class Thinq
 
     private function shouldDisableApiCall()
     {
-        return App::environment() === 'local' && $this->config->shouldDisableApiCalls();
+        return $this->config->shouldDisableApiCalls();
     }
 }
