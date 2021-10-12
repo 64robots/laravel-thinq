@@ -20,7 +20,11 @@ class ThinqChannel
     {
         $message = $notification->toThinq($notifiable);
 
-        if(property_exists($notification, 'silent') && $notification->silent) {
+        if (!($message instanceof ThinqMessage)) {
+            return;
+        }
+
+        if (property_exists($notification, 'silent') && $notification->silent) {
             $this->thinq->withMessage($message)->sentSilentSms();
         } else {
             $this->thinq->withMessage($message)->sentSms();
